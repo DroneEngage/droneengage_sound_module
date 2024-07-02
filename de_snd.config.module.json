@@ -1,0 +1,12 @@
+{ 
+  // A name and GUID for this module as multiple modules sometimes can be added.
+  "module_id": "SND", 
+  
+  // IP & Port Communication Module is listening to.
+  "s2s_udp_target_ip": "127.0.0.1",
+  "s2s_udp_target_port": "60000", 
+  // IP & Port of this module
+  "s2s_udp_listening_ip": "127.0.0.1", 
+  "s2s_udp_listening_port": "61024", 
+  "s2s_udp_packet_size": "8192"
+}
