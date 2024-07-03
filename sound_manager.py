@@ -33,19 +33,6 @@ class CSoundManager(object):
         
         try:
             subprocess.run(["espeak-ng", "-a", str(self.m_volume * 2), "-v", self.m_language, "-p", str(self.m_pitch) , text], check=True)
-            # # Run the espeak-ng command with sudo and pipe the output to aplay
-            # volume = self.m_volume * 2
-            # language = self.m_language
-            # pitch = self.m_pitch
 
-            # cmd = ["sudo", "espeak-ng", "-a", str(volume), "-v", language, "-p", str(pitch), text]
-            # espeak_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            # aplay_proc = subprocess.Popen(["sudo", "aplay"], stdin=espeak_proc.stdout, stderr=subprocess.DEVNULL)
-
-            # # Wait for both processes to complete
-            # stdout, stderr = espeak_proc.communicate()
-            # aplay_proc.communicate()
-            
         except subprocess.CalledProcessError as e:
             print(f"Error running espeak-ng: {e}")

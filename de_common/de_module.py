@@ -4,6 +4,8 @@ import json
 import time
 import threading
 from enum import Enum
+
+from de_common.colors import *
 from de_common.messages import *
 from de_common.udpClient import *
 
@@ -153,6 +155,9 @@ class CModule(object):
         self.sendMSG(message, datalength)
 
     def onReceive(self, message, len):
+        """
+            This function is called from udpClient when a complete message has been received.
+        """
         # print(f"RX MSG: :len {len}:{message}")
 
         try:
@@ -166,6 +171,11 @@ class CModule(object):
                 return
 
             if jMsg[INTERMODULE_ROUTING_TYPE] == CMD_TYPE_INTERMODULE:
+                """
+                    CMD_TYPE_INTERMODULE messages section.
+                    These messages are sent by other modules to be consumed only 
+                    by modules and not to be sent outside DroneEngage unit.
+                """                    
                 if ANDRUAV_PROTOCOL_MESSAGE_CMD not in jMsg:
                     return
 
@@ -186,7 +196,7 @@ class CModule(object):
                     self.m_group_id = moduleID[ANDRUAV_PROTOCOL_GROUP_ID]
 
                     if not self.m_FirstReceived:
-                        print(f" ** Communicator Server Found: m_party_id({self.m_party_id}) m_group_id({self.m_group_id})")
+                        print(SUCCESS_CONSOLE_BOLD_TEXT + " ** Communicator Server Found: " + SUCCESS_CONSOLE_TEXT +  "m_party_id(" + INFO_CONSOLE_TEXT + str(self.m_party_id) + SUCCESS_CONSOLE_TEXT + ") m_group_id(" + INFO_CONSOLE_TEXT + str(self.m_group_id) + SUCCESS_CONSOLE_TEXT + ")" + NORMAL_CONSOLE_TEXT)
                         self.createJSONID(False)
                         self.m_FirstReceived = True
 
@@ -205,11 +215,12 @@ class CModule(object):
             print(f"ERROR:{e}")
 
     
-    def appendExtraField(self, name, ms):
-        self.m_stdinValues[name] = ms
-
-
     def createJSONID(self, reSend):
+        """
+        Create TYPE_AndruavModule_ID - JSON message 
+        This message is essential to identify module to de-Communicator.
+        """
+        
         json_msg = {}
         
         json_msg[INTERMODULE_ROUTING_TYPE] = CMD_TYPE_INTERMODULE
@@ -234,4 +245,5 @@ class CModule(object):
         
         #print(json.dumps(json_msg, indent=4))
         
+        ## Store the message into cUDPClient
         self.cUDPClient.setJsonId(json.dumps(json_msg))

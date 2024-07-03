@@ -1,8 +1,7 @@
-import sys
-import json
 import random
-import time
 import argparse
+from datetime import datetime
+
 
 from __version__ import __version__
 from de_common.colors import *
@@ -32,20 +31,16 @@ baseFacade = CFacade_Base (cModule)
 def generate_random_module_id():
     return ''.join(random.choice('0123456789') for _ in range(12))
 
-
-
-
 def displayVersion():
-    print(SUCCESS_CONSOLE_BOLD_TEXT + "Drone-Engage P2P-ESP32 Module version " + INFO_CONSOLE_TEXT + __version__ + NORMAL_CONSOLE_TEXT)
+    print(SUCCESS_CONSOLE_BOLD_TEXT + "Drone-Engage Sound Module version " + INFO_CONSOLE_TEXT + __version__ + NORMAL_CONSOLE_TEXT)
 
 def displayVersionOnly():
     print(__version__)
 
-
 if __name__ == "__main__":
     
-
     module_id = generate_random_module_id()
+    print(SUCCESS_CONSOLE_BOLD_TEXT + "=================== STARTING PLUGIN ===================" + NORMAL_CONSOLE_TEXT)
     
     parser = argparse.ArgumentParser(description='Sound Module Arguments')
     parser.add_argument('-c', '--config', default=None, help='Configuration file name')
@@ -61,40 +56,43 @@ if __name__ == "__main__":
         displayVersionOnly()
         exit(0)
 
+    displayVersion()
+    print(LOG_CONSOLE_BOLD_TEXT + str(datetime.now()) + NORMAL_CONSOLE_TEXT)
+
+    config_file_name = 'de_snd.config.module.json'
     if args.config:
-        config_file = ConfigFile(args.config)
-    else:
-        config_file = ConfigFile('de_snd.config.module.json')
+        config_file_name = args.config
+    
+    
+    print(LOG_CONSOLE_BOLD_TEXT + "Read internal config file: " + INFO_CONSOLE_TEXT + config_file_name + NORMAL_CONSOLE_TEXT)
+
+    config_file = ConfigFile(config_file_name)
 
     
-    print(INFO_CONSOLE_TEXT + "Client Module-Started " + NORMAL_CONSOLE_TEXT)
-
+    
     # Define a Module
     cModule.defineModule(
-        MODULE_CLASS_SOUND,
+        MODULE_CLASS_SOUND,  ## This class id known system-wide and is hardcoded.
         config_file.get_value('module_id'),
         "6b9858bc5ab9",
         __version__,
-        MESSAGE_FILTER  
+        MESSAGE_FILTER      ## List of messages that this module wants to capture from de_communicator.
     )
 
-    
+    # Initialize module and start communicator with de-communication.
     cModule.init(config_file.get_value('s2s_udp_target_ip'), 
                  int(config_file.get_value('s2s_udp_target_port'), base=10),
                  config_file.get_value('s2s_udp_listening_ip'),
                  int(config_file.get_value('s2s_udp_listening_port'), base=10),
                  DEFAULT_UDP_DATABUS_PACKET_SIZE)
 
-    print("Client Module RUNNING ")
+    #print("Client Module RUNNING ")
 
-    while True:
-        time.sleep(1)
-        print("Client Module RUNNING ")
+    #while True:
+    #    time.sleep(1)
+        #print("Client Module RUNNING ")
         #baseFacade.sendErrorMessage("",NOTIFICATION_TYPE_NOTICE, ERROR_USER_DEFINED, NOTIFICATION_TYPE_INFO,"Hello from python")
 
 
-    #ifdef DEBUG
-    print("EXIT ")
-    #endif
-
+    
     
