@@ -18,8 +18,8 @@ DEFAULT_UDP_DATABUS_PACKET_SIZE = 8192
 
 
 MESSAGE_FILTER = [ TYPE_AndruavMessage_ID,
-                    TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH,
-                    TYPE_AndruavMessage_SOUND_PLAY_FILE
+                   TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH,
+                   TYPE_AndruavMessage_SOUND_PLAY_FILE
 ]
 
 

@@ -183,10 +183,10 @@ class CModule(object):
 
                 message_type = jMsg[ANDRUAV_PROTOCOL_MESSAGE_TYPE]
                 if message_type == TYPE_AndruavModule_ID:
-                    moduleID = cmd["f"]
-
                     if "f" not in cmd:
                         return
+                    moduleID = cmd["f"]
+
                     if ANDRUAV_PROTOCOL_SENDER not in moduleID:
                         return
                     if ANDRUAV_PROTOCOL_GROUP_ID not in moduleID:
