@@ -35,7 +35,7 @@ espeak-ng -a 150 -p 75 "Hello, how are you today?"
 ```
 
 
-### Bluetooth Setup (Optional)
+## Bluetooth Setup (Optional)
 
 ```sh
 bluetoothctl 
@@ -46,14 +46,14 @@ pair 6D:4C:21:3A:DB:53
 connect 6D:4C:21:3A:DB:53
 ```
 
-### Usage
+## Usage
 
 You can use this module by sending text from WebClient.
 
 [![Sound Interface](https://raw.githubusercontent.com/DroneEngage/droneengage_sound_module/f12e6f30ec7e0ab805bde4034d5d60a340d9c114/resources/screen1.png "Sound Interface")](https://raw.githubusercontent.com/DroneEngage/droneengage_sound_module/f12e6f30ec7e0ab805bde4034d5d60a340d9c114/resources/screen1.png "Sound Interface")
 
 
-### Configuration
+## Configuration
 
 The module configuration is stored in a JSON file. Below is an example configuration file (de_snd.config.module.json):
 
@@ -67,7 +67,7 @@ The module configuration is stored in a JSON file. Below is an example configura
 }
 
 
-### Running the Module
+## Running the Module
 To run the module, use the following command:
 python3 de_sound_module.py
 
