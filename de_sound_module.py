@@ -29,12 +29,24 @@ cModule.m_OnReceive = cParser.parseMessage
 baseFacade = CFacade_Base (cModule)
 
 def generate_random_module_id():
+    """
+    Generates a random module ID consisting of 12 digits.
+
+    Returns:
+        str: A random 12-digit module ID.
+    """
     return ''.join(random.choice('0123456789') for _ in range(12))
 
 def displayVersion():
+    """
+    Displays the current version of the Drone-Engage Sound Module.
+    """
     print(SUCCESS_CONSOLE_BOLD_TEXT + "Drone-Engage Sound Module version " + INFO_CONSOLE_TEXT + __version__ + NORMAL_CONSOLE_TEXT)
 
 def displayVersionOnly():
+    """
+    Displays only the version number of the Drone-Engage Sound Module.
+    """
     print(__version__)
 
 if __name__ == "__main__":
@@ -66,6 +78,7 @@ if __name__ == "__main__":
     
     print(LOG_CONSOLE_BOLD_TEXT + "Read internal config file: " + INFO_CONSOLE_TEXT + config_file_name + NORMAL_CONSOLE_TEXT)
 
+    # Load configuration
     config_file = ConfigFile(config_file_name)
 
     
@@ -85,14 +98,6 @@ if __name__ == "__main__":
                  config_file.get_value('s2s_udp_listening_ip'),
                  int(config_file.get_value('s2s_udp_listening_port'), base=10),
                  DEFAULT_UDP_DATABUS_PACKET_SIZE)
-
-    #print("Client Module RUNNING ")
-
-    #while True:
-    #    time.sleep(1)
-        #print("Client Module RUNNING ")
-        #baseFacade.sendErrorMessage("",NOTIFICATION_TYPE_NOTICE, ERROR_USER_DEFINED, NOTIFICATION_TYPE_INFO,"Hello from python")
-
 
     
     
