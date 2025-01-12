@@ -1,6 +1,9 @@
 import subprocess
 import platform
 
+
+from de_common.colors import *
+
 try:
     import pyttsx3
     pyttsx3_available = True
@@ -28,7 +31,7 @@ class CSoundManager(object):
         elif pyttsx3_available:
             self.use_pyttsx3 = True  # Use pyttsx3
         else:
-            raise RuntimeError("No suitable speech engine found.")
+            raise RuntimeError(ERROR_CONSOLE_BOLD_TEXT + "No suitable speech engine found." + NORMAL_CONSOLE_TEXT)
 
     def say(self, text, language, pitch, volume):
         if isinstance(volume, int):
@@ -42,16 +45,19 @@ class CSoundManager(object):
         else:
             raise ValueError("Unsupported language.")
 
-        if self.use_pyttsx3:
-            self._speak_with_pyttsx3(text)
-        else:
-            self._speak_with_espeak_ng(text)
+        try:
+            if self.use_pyttsx3:
+                self._speak_with_pyttsx3(text)
+            else:
+                self._speak_with_espeak_ng(text)
+        except Exception as e:
+            print(ERROR_CONSOLE_BOLD_TEXT + f"Error speaking text: {e}" + NORMAL_CONSOLE_TEXT) 
 
     def _speak_with_espeak_ng(self, text):
         try:
             subprocess.run(["espeak-ng", "-a", str(self.m_volume), "-v", self.m_language, "-p", str(self.m_pitch), text], check=True)
         except subprocess.CalledProcessError as e:
-            print(f"Error running espeak-ng: {e}")
+            print(ERROR_CONSOLE_BOLD_TEXT + f"Error running espeak-ng: {e}" + NORMAL_CONSOLE_TEXT)
 
     def _speak_with_pyttsx3(self, text):
         engine = pyttsx3.init()
