@@ -26,9 +26,19 @@ Serves as a **reference sample** for writing DroneEngage plugins in Python.
 
 ### 1. System dependencies (Ubuntu / Debian / Raspberry Pi OS)
 
+The easiest way is to use the provided install script, which detects your
+package manager (apt/dnf/yum/pacman), installs everything missing, and
+verifies the result:
+
+```bash
+./install.sh
+```
+
+Or install manually:
+
 ```bash
 sudo apt-get update
-sudo apt-get install espeak-ng alsa-utils mpg123
+sudo apt-get install espeak-ng alsa-utils mpg123 ffmpeg
 ```
 
 - `espeak-ng` — required, text-to-speech engine
