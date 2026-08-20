@@ -57,11 +57,11 @@ class CUDPClient(object):
         self.m_starrted = True
 
     def startReceiver(self):
-        self.m_threadCreateUDPSocket = threading.Thread(target=self.InternalReceiverEntry)
+        self.m_threadCreateUDPSocket = threading.Thread(target=self.InternalReceiverEntry, daemon=True)
         self.m_threadCreateUDPSocket.start()
 
     def startSenderID(self):
-        self.m_threadSenderID = threading.Thread(target=self.InternelSenderIDEntry)
+        self.m_threadSenderID = threading.Thread(target=self.InternelSenderIDEntry, daemon=True)
         self.m_threadSenderID.start()
 
     def stop(self):
@@ -69,8 +69,8 @@ class CUDPClient(object):
         if self.m_SocketFD != -1:
             self.m_SocketFD.close()
         if self.m_starrted:
-            self.m_threadCreateUDPSocket.join()
-            self.m_threadSenderID.join()
+            self.m_threadCreateUDPSocket.join(timeout=2)
+            self.m_threadSenderID.join(timeout=2)
         del self.m_ModuleAddress
         del self.m_CommunicatorModuleAddress
 
@@ -82,11 +82,21 @@ class CUDPClient(object):
         receivedChunks = []  # List to store the received data chunks
 
         while not self.m_stopped_called:
-            # Receive data from the socket
-            received, cliaddr = self.m_SocketFD.recvfrom(self.MAXLINE)
+            try:
+                # Receive data from the socket
+                received, cliaddr = self.m_SocketFD.recvfrom(self.MAXLINE)
+            except OSError:
+                # Socket was closed (e.g. via stop()); exit the loop.
+                if self.m_stopped_called:
+                    break
+                continue
 
             # Check if any data was received
             if len(received) > 0:
+                if len(received) < 2:
+                    print(f"ERROR: Received packet too small: {len(received)} bytes")
+                    continue
+
                 # Extract the chunk number from the received data
                 chunkNumber = (received[1] << 8) | received[0]
 
@@ -102,9 +112,16 @@ class CUDPClient(object):
                     # Concatenate all the received chunks into a single byte string
                     concatenatedData = b''.join(receivedChunks)
 
+                    # NOTICE: we don't know if this is a text or a text+binary message
+                    # so a null terminator is appended; it should be stripped later if binary.
+                    concatenatedData += b'\x00'
+
                     # Call the callback function, if it exists, with the concatenated data and its length
                     if self.m_callback:
-                        self.m_callback(concatenatedData, len(concatenatedData))
+                        try:
+                            self.m_callback(concatenatedData, len(concatenatedData))
+                        except Exception as e:
+                            print(f"ERROR: onReceive callback failed: {e}")
 
                     # Reset the receivedChunks list for the next set of data
                     receivedChunks = []

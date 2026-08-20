@@ -33,6 +33,31 @@ class CFacade_Base:
 
         print(f"\n{SUCCESS_CONSOLE_BOLD_TEXT} -- sendErrorMessage {NORMAL_CONSOLE_TEXT}{description}")
 
+    def API_sendConfigTemplate(self, target_party_id, module_key, json_file_content_json, reply):
+        message = {
+            "a": CONFIG_STATUS_FETCH_CONFIG_TEMPLATE,
+            "b": json_file_content_json,
+            "k": module_key,
+            "R": reply
+        }
+
+        self.m_module.sendJMSG(target_party_id, message, TYPE_AndruavMessage_CONFIG_STATUS, False)
+
+    def API_sendSoundList(self, target_party_id, sound_files, reply):
+        """
+        Sends the configured sound file library to the GCS so the audio gadget
+        can display a dropdown instead of a free-text path input.
+        Mirrors the camera module's sendCameraList: payload "T" is the list of
+        {"n": name, "f": file_path} entries, "R" marks a reply to a request.
+        Use target_party_id="" to broadcast to all GCS (e.g. after a config apply).
+        """
+        message = {
+            "T": sound_files,
+            "R": reply
+        }
+
+        self.m_module.sendJMSG(target_party_id, message, TYPE_AndruavMessage_SOUND_LIST, False)
+
 class MyFacade(CFacade_Base):
     def __init__(self, m_module):
         super().__init__(m_module)

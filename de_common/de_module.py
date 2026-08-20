@@ -17,6 +17,10 @@ MODULE_FEATURE_RECEIVING_TELEMETRY      = "R"
 MODULE_FEATURE_SENDING_TELEMETRY        = "T"
 MODULE_FEATURE_CAPTURE_IMAGE            = "C"
 MODULE_FEATURE_CAPTURE_VIDEO            = "V"
+MODULE_FEATURE_GPIO                     = "G"
+MODULE_FEATURE_AI_RECOGNITION           = "A"
+MODULE_FEATURE_TRACKING                 = "K"
+MODULE_FEATURE_P2P                      = "P"
 
 
 MODULE_CLASS_COMM                       = "comm"
@@ -24,6 +28,10 @@ MODULE_CLASS_FCB                        = "fcb"
 MODULE_CLASS_VIDEO                      = "camera"
 MODULE_CLASS_P2P                        = "p2p"
 MODULE_CLASS_GENERIC                    = "gen"
+MODULE_CLASS_GPIO                       = "gpio"
+MODULE_CLASS_A_RECOGNITION              = "ai_rec"
+MODULE_CLASS_TRACKING                   = "trk"
+MODULE_CLASS_VIEWLINK                   = "vlk"
 
 HARDWARE_TYPE_UNDEFINED = 0
 HARDWARE_TYPE_CPU = 1
@@ -51,7 +59,7 @@ class CModule(object):
         self.m_FirstReceived = False
         self.m_module_features = []  # Initialize the list of module features
         self.m_hardware_serial = ""
-        self.m_hardware_serial_type = ""
+        self.m_hardware_serial_type = 0
         self.m_instance_time_stamp = time.time()
         self.m_lock = threading.RLock()
 
@@ -86,13 +94,13 @@ class CModule(object):
     
     def send_sys_msg(self, jmsg, andruav_message_id):
         full_message = {
-            ANDRUAV_PROTOCOL_TARGET_ID: SPECIAL_NAME_SYS_NAME,
+            ANDRUAV_PROTOCOL_TARGET_ID: ANDRUAV_PROTOCOL_SENDER_COMM_SERVER,
             INTERMODULE_ROUTING_TYPE: CMD_COMM_SYSTEM,
             ANDRUAV_PROTOCOL_MESSAGE_TYPE: andruav_message_id,
             ANDRUAV_PROTOCOL_MESSAGE_CMD: jmsg
         }
         msg = json.dumps(full_message)
-        self.send_msg(msg.encode(), len(msg))
+        self.sendMSG(msg.encode(), len(msg))
 
     def sendJMSG(self, targetPartyID, jmsg, andruav_message_id, internal_message):
         with self.m_lock:
@@ -143,8 +151,8 @@ class CModule(object):
         with self.m_lock:
             json_msg = {
                 INTERMODULE_MODULE_KEY: self.m_module_key,
-                INTERMODULE_ROUTING_TYPE: "CMD_TYPE_INTERMODULE",
-                ANDRUAV_PROTOCOL_MESSAGE_TYPE: "TYPE_AndruavModule_RemoteExecute",
+                INTERMODULE_ROUTING_TYPE: CMD_TYPE_INTERMODULE,
+                ANDRUAV_PROTOCOL_MESSAGE_TYPE: TYPE_AndruavModule_RemoteExecute,
                 ANDRUAV_PROTOCOL_MESSAGE_CMD: {"C": command_type}
             }
 
@@ -161,7 +169,11 @@ class CModule(object):
         # print(f"RX MSG: :len {len}:{message}")
 
         try:
-            jMsg = json.loads(message)
+            # The JSON header is always null-terminated; any binary payload (not
+            # currently used by this module) would follow the null terminator.
+            null_index = message.find(b'\x00')
+            json_part = message[:null_index] if null_index != -1 else message
+            jMsg = json.loads(json_part)
 
             # print(f"RX MSG: jMsg{json.dumps(jMsg)}")
 
@@ -183,10 +195,10 @@ class CModule(object):
 
                 message_type = jMsg[ANDRUAV_PROTOCOL_MESSAGE_TYPE]
                 if message_type == TYPE_AndruavModule_ID:
-                    moduleID = cmd["f"]
-
-                    if "f" not in cmd:
+                    if JSON_INTERMODULE_PARTY_RECORD not in cmd:
                         return
+                    moduleID = cmd[JSON_INTERMODULE_PARTY_RECORD]
+
                     if ANDRUAV_PROTOCOL_SENDER not in moduleID:
                         return
                     if ANDRUAV_PROTOCOL_GROUP_ID not in moduleID:
@@ -232,8 +244,14 @@ class CModule(object):
         ms[JSON_INTERMODULE_MODULE_MESSAGES_LIST] = self.m_message_filter
         ms[JSON_INTERMODULE_MODULE_FEATURES] = self.m_module_features
         ms[JSON_INTERMODULE_MODULE_KEY] = self.m_module_key
-        #ms[JSON_INTERMODULE_HARDWARE_ID] = self.m_hardware_serial
-        ms[JSON_INTERMODULE_HARDWARE_TYPE] = self.m_hardware_serial_type
+        # Only include hardware fields when a hardware serial has been set
+        # (via set_hardware). The C++ communicator enters its license-check
+        # branch when JSON_INTERMODULE_HARDWARE_ID is present, and expects
+        # JSON_INTERMODULE_HARDWARE_TYPE to be an int. Sending empty strings
+        # here causes json.exception.type_error.302 on the C++ side.
+        if self.m_hardware_serial:
+            ms[JSON_INTERMODULE_HARDWARE_ID] = self.m_hardware_serial
+            ms[JSON_INTERMODULE_HARDWARE_TYPE] = self.m_hardware_serial_type
         ms[JSON_INTERMODULE_VERSION] = self.m_module_version
         ms[JSON_INTERMODULE_RESEND] = reSend
         ms[JSON_INTERMODULE_TIMESTAMP_INSTANCE] = self.m_instance_time_stamp

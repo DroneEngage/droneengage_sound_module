@@ -1,0 +1,108 @@
+[
+    {
+        "name": "Communication",
+        "template": {
+            "module id": {
+                "fieldName": "module_id",
+                "type": "text",
+                "defaultvalue": "SND",
+                "optional": false,
+                "desc": "A name and GUID for this module as multiple modules sometimes can be added."
+            },
+            "s2s udp target ip": {
+                "fieldName": "s2s_udp_target_ip",
+                "type": "text",
+                "defaultvalue": "127.0.0.1",
+                "optional": false,
+                "desc": "IP of the Communication Module this module talks to."
+            },
+            "s2s udp target port": {
+                "fieldName": "s2s_udp_target_port",
+                "type": "text",
+                "defaultvalue": "60000",
+                "optional": false,
+                "desc": "Port of the Communication Module this module talks to."
+            },
+            "s2s udp listening ip": {
+                "fieldName": "s2s_udp_listening_ip",
+                "type": "text",
+                "defaultvalue": "127.0.0.1",
+                "optional": false,
+                "desc": "local IP this module listens on for inter-module UDP."
+            },
+            "s2s udp listening port": {
+                "fieldName": "s2s_udp_listening_port",
+                "type": "text",
+                "defaultvalue": "61025",
+                "optional": false,
+                "desc": "local port this module listens on for inter-module UDP."
+            },
+            "s2s udp packet size": {
+                "fieldName": "s2s_udp_packet_size",
+                "type": "text",
+                "defaultvalue": "8192",
+                "optional": true,
+                "desc": "UDP datagram payload size in bytes. If omitted, the default databus packet size is used."
+            }
+        }
+    },
+    {
+        "name": "Speech Settings",
+        "template": {
+            "default volume": {
+                "fieldName": "default_volume",
+                "type": "number",
+                "defaultvalue": 100,
+                "optional": true,
+                "desc": "Default speech volume (0-100). Can be overridden per-message."
+            },
+            "default pitch": {
+                "fieldName": "default_pitch",
+                "type": "number",
+                "defaultvalue": 50,
+                "optional": true,
+                "desc": "Default espeak-ng pitch (0-99). Can be overridden per-message."
+            },
+            "default language": {
+                "fieldName": "default_language",
+                "type": "combo",
+                "defaultvalue": "en",
+                "list_values": ["en", "ar", "ru", "es", "ja"],
+                "optional": true,
+                "desc": "Default speech language. Can be overridden per-message. Keep in sync with the language dropdown in jsc_ctrl_audio.jsx."
+            },
+            "muted": {
+                "fieldName": "muted",
+                "type": "checkbox",
+                "defaultvalue": false,
+                "optional": true,
+                "desc": "Mute all speech/file playback without stopping the module."
+            }
+        }
+    },
+    {
+        "name": "Sound Files",
+        "template": {
+            "sound files": {
+                "fieldName": "sound_files",
+                "type": "array",
+                "optional": true,
+                "desc": "Sound file library. Each entry maps a friendly name (shown in the GCS audio gadget dropdown) to an absolute file path on the unit (wav/mp3).",
+                "array_template": {
+                    "name": {
+                        "order": 1,
+                        "type": "text",
+                        "defaultvalue": "Alarm",
+                        "desc": "display name shown in the GCS audio gadget dropdown"
+                    },
+                    "file": {
+                        "order": 2,
+                        "type": "text",
+                        "defaultvalue": "/home/pi/sounds/alarm.wav",
+                        "desc": "absolute file path on the unit (wav/mp3)"
+                    }
+                }
+            }
+        }
+    }
+]

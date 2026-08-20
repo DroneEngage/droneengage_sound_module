@@ -7,6 +7,32 @@
   "s2s_udp_target_port": "60000", 
   // IP & Port of this module
   "s2s_udp_listening_ip": "127.0.0.1", 
-  "s2s_udp_listening_port": "61024", 
-  "s2s_udp_packet_size": "8192"
+  "s2s_udp_listening_port": "61025", 
+  "s2s_udp_packet_size": "8192",
+
+  // Default speech settings and mute switch. Can be changed remotely via
+  // TYPE_AndruavMessage_CONFIG_ACTION / CONFIG_ACTION_APPLY_CONFIG.
+  "default_volume": 100,
+  "default_pitch": 50,
+  "default_language": "en",
+  "muted": false,
+
+  // Sound file library. Each entry maps a friendly name (shown in the GCS
+  // audio gadget dropdown) to an absolute file path on the unit. The module
+  // exposes this list to the GCS via TYPE_AndruavMessage_SOUND_LIST so the
+  // operator can pick a sound by name instead of typing a raw path.
+  // Editable from the GCS config UI ("Sound Files" group).
+  // Files are stored in the sound_box/ folder next to this config.
+  // Sources: OpenGameArt (CC0 unless noted otherwise).
+  "sound_files": [
+    { "name": "Beep",            "file": "sound_box/beep.wav" },
+    { "name": "Beep Tone",       "file": "sound_box/beep_tone.ogg" },
+    { "name": "Alert",           "file": "sound_box/alert.wav" },
+    { "name": "Alarm",           "file": "sound_box/alarm.wav" },
+    { "name": "Warning",         "file": "sound_box/warning.wav" },
+    { "name": "Siren",           "file": "sound_box/siren.mp3" },
+    { "name": "Facility Siren",  "file": "sound_box/facility_siren.wav" },
+    { "name": "Positive",        "file": "sound_box/positive.ogg" },
+    { "name": "Success",         "file": "sound_box/success.wav" }
+  ]
 }
